@@ -121,6 +121,7 @@ export const populations: Population[] = [
         quality: "Excellent",
         rationale:
           "Critical: Home safety evaluation, ADL training, adaptive equipment for bathroom/kitchen",
+        cost: { visits: 3, clinicalTime: 135, money: 120, effort: 2 },
       },
       {
         id: "ref-urology",
@@ -130,6 +131,7 @@ export const populations: Population[] = [
         quality: "Excellent",
         rationale:
           "Essential: Managing urge incontinence to stop dangerous fluid restriction behavior",
+        cost: { visits: 0, clinicalTime: 0, money: 75, effort: 1 },
       },
       {
         id: "ref-area-aging",
@@ -139,6 +141,7 @@ export const populations: Population[] = [
         quality: "Good",
         rationale:
           "Helpful: Senior services, meal delivery, transportation, social programs",
+        cost: { visits: 0, clinicalTime: 0, money: 0, effort: 1 },
       },
       {
         id: "ref-geriatrics",
@@ -148,6 +151,7 @@ export const populations: Population[] = [
         quality: "Good",
         rationale:
           "Helpful: Comprehensive medication review, polypharmacy management",
+        cost: { visits: 0, clinicalTime: 0, money: 50, effort: 1 },
       },
       {
         id: "ref-psychology",
@@ -156,6 +160,7 @@ export const populations: Population[] = [
         prevention: "Tertiary",
         quality: "Good",
         rationale: "Beneficial: Address fear of falling and activity avoidance",
+        cost: { visits: 0, clinicalTime: 0, money: 80, effort: 2 },
       },
       {
         id: "ref-meals-wheels",
@@ -164,6 +169,7 @@ export const populations: Population[] = [
         prevention: "Tertiary",
         quality: "OK",
         rationale: "Supportive: Nutrition support if mobility further declines",
+        cost: { visits: 0, clinicalTime: 0, money: 25, effort: 0 },
       },
       {
         id: "ref-podiatry",
@@ -173,6 +179,7 @@ export const populations: Population[] = [
         quality: "OK",
         rationale:
           "Preventive: Foot care to prevent falls from nail/foot issues",
+        cost: { visits: 0, clinicalTime: 0, money: 40, effort: 1 },
       },
       {
         id: "ref-orthopedics",
@@ -181,6 +188,7 @@ export const populations: Population[] = [
         prevention: "Secondary",
         quality: "Neutral",
         rationale: "Low priority: Fracture healed, osteoporosis managed by PCP",
+        cost: { visits: 0, clinicalTime: 0, money: 100, effort: 2 },
       },
       {
         id: "ref-pain-management",
@@ -189,6 +197,7 @@ export const populations: Population[] = [
         prevention: "Tertiary",
         quality: "Neutral",
         rationale: "Low priority: Pain not primary complaint",
+        cost: { visits: 0, clinicalTime: 0, money: 150, effort: 2 },
       },
     ],
     populationInterventions: [
@@ -344,6 +353,7 @@ export const populations: Population[] = [
             prevention: "Secondary",
             quality: "Excellent",
             rationale: "Correct (2°): Essential for bone density maintenance.",
+            cost: { visits: 2, clinicalTime: 45, money: 30, effort: 4 },
           },
           {
             id: "vestibular-habituation-exercises",
@@ -353,6 +363,7 @@ export const populations: Population[] = [
             quality: "Excellent",
             rationale:
               "Correct (3°): Rehab for specific vestibular impairment.",
+            cost: { visits: 4, clinicalTime: 120, money: 40, effort: 3 },
           },
           {
             id: "high-velocity-spinal-flexion-crunches",
@@ -361,6 +372,7 @@ export const populations: Population[] = [
             prevention: "Tertiary",
             quality: "Unsafe",
             rationale: "Contraindicated: Increases fracture risk.",
+            cost: { visits: 1, clinicalTime: 15, money: 0, effort: 5 },
           },
           {
             id: "passive-ankle-pumps-seated",
@@ -369,6 +381,7 @@ export const populations: Population[] = [
             prevention: "Tertiary",
             quality: "Neutral",
             rationale: "Low Value: Too low intensity.",
+            cost: { visits: 0, clinicalTime: 0, money: 0, effort: 1 },
           },
           {
             id: "mindfulness-for-body-awareness",
@@ -377,6 +390,7 @@ export const populations: Population[] = [
             prevention: "Tertiary",
             quality: "Good",
             rationale: "Good (3°): Manages fear and proprioception.",
+            cost: { visits: 1, clinicalTime: 30, money: 15, effort: 2 },
           },
           {
             id: "progressive-resistance-bands",
@@ -385,6 +399,7 @@ export const populations: Population[] = [
             prevention: "Secondary",
             quality: "Excellent",
             rationale: "Correct (2°): Strength training safe for home.",
+            cost: { visits: 1, clinicalTime: 30, money: 25, effort: 3 },
           },
           {
             id: "single-leg-stance-training",
@@ -393,6 +408,7 @@ export const populations: Population[] = [
             prevention: "Secondary",
             quality: "Excellent",
             rationale: "Correct (2°): Key balance exercise.",
+            cost: { visits: 1, clinicalTime: 20, money: 0, effort: 2 },
           },
           {
             id: "deep-breathing-for-pain",
@@ -401,6 +417,7 @@ export const populations: Population[] = [
             prevention: "Tertiary",
             quality: "Good",
             rationale: "Helpful (3°): Pain management technique.",
+            cost: { visits: 0, clinicalTime: 15, money: 0, effort: 1 },
           },
         ],
       },
@@ -416,6 +433,7 @@ export const populations: Population[] = [
             prevention: "Tertiary",
             quality: "Excellent",
             rationale: "Correct (3°): Functional rehabilitation.",
+            cost: { visits: 2, clinicalTime: 40, money: 0, effort: 4 },
           },
           {
             id: "safe-reaching-mechanics-education",
@@ -424,6 +442,7 @@ export const populations: Population[] = [
             prevention: "Secondary",
             quality: "OK",
             rationale: "Helpful (2°): Prevents future injury.",
+            cost: { visits: 1, clinicalTime: 20, money: 0, effort: 2 },
           },
           {
             id: "restrict-walking-to-indoors-only",
@@ -432,6 +451,7 @@ export const populations: Population[] = [
             prevention: "Secondary",
             quality: "Unsafe",
             rationale: "Harmful: Avoidance leads to decline.",
+            cost: { visits: 0, clinicalTime: 5, money: 0, effort: 0 },
           },
           {
             id: "upper-body-ergometer-low-resistance",
@@ -736,6 +756,13 @@ export const populations: Population[] = [
         category: 'safety',
       },
     ],
+    // Budget constraints (dual: therapist + patient resources)
+    budget: {
+      visits: 12,          // Medicare Part B typical authorization
+      clinicalTime: 540,   // 12 visits × 45 min average
+      money: 600,          // Fixed income, 20% copay limit
+      effort: 25,          // Low energy, osteoporosis fatigue
+    },
   },
   {
     id: "neuro",

@@ -12,13 +12,11 @@ import {
   Globe,
   User,
 } from "lucide-react";
-import type { SDOHFactor, HRSNIndicator, CriticalNeed } from "../../types";
+import type { SDOHFactor, HRSNIndicator } from "../../types";
 
 interface SDOHPanelProps {
   sdohFactors?: SDOHFactor[];
   hrsnIndicators?: HRSNIndicator[];
-  criticalNeeds: CriticalNeed[];
-  addressedCriticalNeeds?: string[];
   embedded?: boolean;
 }
 
@@ -60,17 +58,10 @@ const severityDots: Record<HRSNIndicator["severity"], string> = {
 export const SDOHPanel = ({
   sdohFactors = [],
   hrsnIndicators = [],
-  criticalNeeds,
-  addressedCriticalNeeds = [],
   embedded = false,
 }: SDOHPanelProps) => {
-  const unaddressedCriticalNeeds = criticalNeeds.filter(
-    (need) => !addressedCriticalNeeds.includes(need.id)
-  );
-  const hasUnaddressedCritical = unaddressedCriticalNeeds.length > 0;
-
-  const containerClasses = embedded 
-    ? "mt-8 pt-6 border-t border-slate-200" 
+  const containerClasses = embedded
+    ? "mt-8 pt-6 border-t border-slate-200"
     : "bg-white rounded-xl shadow-sm border border-slate-200 p-5 mb-6";
 
   return (
@@ -82,72 +73,6 @@ export const SDOHPanel = ({
           Social Context & Health-Related Social Needs
         </h3>
       </div>
-
-      {/* Critical Needs Alert */}
-      {criticalNeeds.length > 0 && (
-        <div
-          className={`mb-4 p-4 rounded-lg border-2 ${
-            hasUnaddressedCritical
-              ? "bg-red-50 border-red-300"
-              : "bg-green-50 border-green-300"
-          }`}
-        >
-          <div className="flex items-start gap-2">
-            <AlertTriangle
-              className={`w-5 h-5 mt-0.5 ${
-                hasUnaddressedCritical ? "text-red-600" : "text-green-600"
-              }`}
-            />
-            <div className="flex-1">
-              <h4
-                className={`font-bold text-sm ${
-                  hasUnaddressedCritical ? "text-red-800" : "text-green-800"
-                }`}
-              >
-                {hasUnaddressedCritical
-                  ? `Critical Needs (${unaddressedCriticalNeeds.length} of ${criticalNeeds.length} unaddressed)`
-                  : "✓ All Critical Needs Addressed"}
-              </h4>
-              <p
-                className={`text-xs mt-1 ${
-                  hasUnaddressedCritical ? "text-red-700" : "text-green-700"
-                }`}
-              >
-                {hasUnaddressedCritical
-                  ? "These MUST be addressed in your plan for full credit:"
-                  : "Great work identifying and addressing these essential needs!"}
-              </p>
-              <ul className="mt-2 space-y-1">
-                {criticalNeeds.map((need) => {
-                  const isAddressed = addressedCriticalNeeds.includes(need.id);
-                  return (
-                    <li
-                      key={need.id}
-                      className={`text-sm flex items-start gap-2 ${
-                        isAddressed ? "text-green-700" : "text-red-700"
-                      }`}
-                    >
-                      <span
-                        className={`w-4 h-4 rounded-full text-xs flex items-center justify-center mt-0.5 ${
-                          isAddressed
-                            ? "bg-green-200 text-green-700"
-                            : "bg-red-200 text-red-700"
-                        }`}
-                      >
-                        {isAddressed ? "✓" : "!"}
-                      </span>
-                      <span>
-                        <span className="font-medium">[{need.category}]</span>{" "}
-                        {need.description}
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Two Column Layout: SDOH Factors vs HRSN Indicators */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -228,9 +153,8 @@ export const SDOHPanel = ({
               {hrsnIndicators.map((indicator, idx) => (
                 <div
                   key={idx}
-                  className={`flex items-start gap-2 p-3 rounded-lg border ${
-                    severityColors[indicator.severity]
-                  }`}
+                  className={`flex items-start gap-2 p-3 rounded-lg border ${severityColors[indicator.severity]
+                    }`}
                 >
                   <div className="shrink-0 mt-0.5">
                     {categoryIcons[indicator.category as SDOHCategory] || (
@@ -243,9 +167,8 @@ export const SDOHPanel = ({
                         {indicator.category}
                       </span>
                       <span
-                        className={`w-2 h-2 rounded-full ${
-                          severityDots[indicator.severity]
-                        }`}
+                        className={`w-2 h-2 rounded-full ${severityDots[indicator.severity]
+                          }`}
                       ></span>
                     </div>
                     <p className="text-xs leading-relaxed opacity-90">

@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { preventionLevels } from "../../data/preventionLevels";
 import { UMatterScorecard } from "../ui/UMatterScorecard";
+import { BudgetDashboard } from "../ui/BudgetDashboard";
 import type {
   Intervention,
   WellnessDomainName,
@@ -23,6 +24,8 @@ import type {
   PopulationPlanScore,
   PopulationStrategyType,
   WellnessAnswers,
+  PopulationBudget,
+  ResourceCost,
 } from "../../types";
 
 interface ResultsViewProps {
@@ -44,6 +47,10 @@ interface ResultsViewProps {
   unsafePenalty?: number;
   unsafeInterventions?: string[];
   criticalNeedsAddressed?: boolean;
+  // Resource tracking
+  budget?: PopulationBudget;
+  spent?: ResourceCost;
+  wellnessGain?: number;
 }
 
 export const ResultsView = ({
@@ -63,6 +70,9 @@ export const ResultsView = ({
   unsafePenalty = 0,
   unsafeInterventions = [],
   criticalNeedsAddressed = true,
+  budget,
+  spent,
+  wellnessGain,
 }: ResultsViewProps) => {
   const studentTotal = Object.values(studentResults).reduce((a, b) => a + b, 0);
   const baselineTotal = Object.values(baseline).reduce((a, b) => a + b, 0);
@@ -315,6 +325,21 @@ export const ResultsView = ({
                   </div>
                 ))}
             </div>
+          </div>
+        )}
+
+        {/* Resource Efficiency Analysis */}
+        {budget && spent && (
+          <div className="mb-8">
+            <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center">
+              <Trophy className="w-6 h-6 mr-2 text-amber-500" />
+              Resource Efficiency Analysis
+            </h3>
+            <BudgetDashboard
+              budget={budget}
+              spent={spent}
+              wellnessGain={wellnessGain}
+            />
           </div>
         )}
 

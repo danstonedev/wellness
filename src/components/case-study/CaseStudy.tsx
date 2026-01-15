@@ -11,7 +11,6 @@ import type {
 import { ICFCard } from "../ui/ICFCard";
 import { UMatterScorecard } from "../ui/UMatterScorecard";
 import { SDOHPanel } from "../ui/SDOHPanel";
-import { LearningObjectivesPanel } from "../ui/LearningObjectivesPanel";
 import { DetailPanel } from "./DetailPanel";
 import { WellnessBuilder } from "./WellnessBuilder";
 import { ResultsView } from "./ResultsView";
@@ -245,6 +244,33 @@ export const CaseStudy = ({ population, onBack }: CaseStudyProps) => {
       )
       : true;
 
+    // Calculate spent resources and wellness gain for results
+    let spentVisits = 0;
+    let spentClinicalTime = 0;
+    let spentMoney = 0;
+    let spentEffort = 0;
+    let totalWellnessGain = 0;
+
+    selectedInterventions.forEach((i) => {
+      totalWellnessGain += i.impact || 0;
+      if (i.cost) {
+        spentVisits += i.cost.visits || 0;
+        spentClinicalTime += i.cost.clinicalTime || 0;
+        spentMoney += i.cost.money || 0;
+        spentEffort += i.cost.effort || 0;
+      }
+    });
+
+    selectedReferrals.forEach((r) => {
+      totalWellnessGain += r.impact || 0;
+      if (r.cost) {
+        spentVisits += r.cost.visits || 0;
+        spentClinicalTime += r.cost.clinicalTime || 0;
+        spentMoney += r.cost.money || 0;
+        spentEffort += r.cost.effort || 0;
+      }
+    });
+
     setResults({
       student: newScores,
       max: currentMaxScores,
@@ -253,6 +279,15 @@ export const CaseStudy = ({ population, onBack }: CaseStudyProps) => {
       unsafePenalty,
       unsafeInterventions: unsafeInterventions.map((i) => i.id).filter((id): id is string => !!id),
       criticalNeedsAddressed,
+      // Resource tracking
+      budget: population.budget,
+      spent: {
+        visits: spentVisits,
+        clinicalTime: spentClinicalTime,
+        money: spentMoney,
+        effort: spentEffort
+      },
+      wellnessGain: totalWellnessGain
     });
     setSubmitted(true);
     setTimeout(() => {
@@ -375,9 +410,6 @@ export const CaseStudy = ({ population, onBack }: CaseStudyProps) => {
         </>
       ) : (
         <>
-          {/* Learning Objectives - shown at case start */}
-          <LearningObjectivesPanel objectives={population.learningObjectives} />
-
           <UMatterScorecard
             scores={population.patient.uMatterScores}
             name={population.patient.name}
@@ -390,8 +422,6 @@ export const CaseStudy = ({ population, onBack }: CaseStudyProps) => {
               <SDOHPanel
                 sdohFactors={population.sdohFactors}
                 hrsnIndicators={population.hrsnIndicators}
-                criticalNeeds={population.criticalNeeds || []}
-                addressedCriticalNeeds={addressedCriticalNeeds}
               />
             )}
         </>
@@ -546,6 +576,7 @@ export const CaseStudy = ({ population, onBack }: CaseStudyProps) => {
             selectedPopulationInterventions={selectedPopulationInterventions}
             onTogglePopulationIntervention={togglePopulationIntervention}
             maxPopulationSelection={MAX_POPULATION_SELECTION}
+            budget={population.budget}
           />
         </>
       )}

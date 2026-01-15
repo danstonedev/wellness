@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { wellnessDomains } from "../../data/wellnessDomains";
 import { masterPopulationInterventions } from "../../data/populationInterventionsMaster";
+import { BudgetDashboard } from "../ui/BudgetDashboard";
 import type {
   Intervention,
   WellnessDomainName,
@@ -28,6 +29,7 @@ import type {
   PopulationIntervention,
   PopulationStrategyType,
   SDOHCategory,
+  PopulationBudget,
 } from "../../types";
 
 interface WellnessBuilderProps {
@@ -52,6 +54,7 @@ interface WellnessBuilderProps {
     intervention: PopulationIntervention
   ) => void;
   maxPopulationSelection: number;
+  budget?: PopulationBudget;
 }
 
 
@@ -268,11 +271,12 @@ export const WellnessBuilder = ({
   selectedPopulationInterventions,
   onTogglePopulationIntervention,
   maxPopulationSelection,
+  budget,
 }: WellnessBuilderProps) => {
   const [customGoal, setCustomGoal] = useState("");
   const [customGoalDomain] = useState<WellnessDomainName>("Physical");
   const [isAddingCustom, setIsAddingCustom] = useState(false);
-  const [activeTab, setActiveTab] = useState<string>("healthCondition");
+  const [activeTab, setActiveTab] = useState<string>("all");
 
   const [activeLibrarySection, setActiveLibrarySection] = useState<
     "interventions" | "referrals" | "population"
@@ -349,11 +353,26 @@ export const WellnessBuilder = ({
       .join(" ");
   };
 
+  // Get all interventions from all categories
+  const allInterventions = useMemo(() => {
+    if (!icfData) return [];
+    return [
+      ...(icfData.healthCondition?.interventions || []),
+      ...(icfData.bodyFunctions?.interventions || []),
+      ...(icfData.activities?.interventions || []),
+      ...(icfData.participation?.interventions || []),
+      ...(icfData.environmental?.interventions || []),
+      ...(icfData.personal?.interventions || []),
+    ];
+  }, [icfData]);
+
   // Filter Logic for Interventions
   const filteredInterventions = useMemo(() => {
-    if (!activeCategoryData || !activeCategoryData.interventions) return [];
+    const sourceInterventions = activeTab === "all"
+      ? allInterventions
+      : activeCategoryData?.interventions || [];
 
-    return activeCategoryData.interventions.filter((item) => {
+    return sourceInterventions.filter((item) => {
       const textDisplay = item.text || (item.id ? formatLabel(item.id) : "");
       const matchesSearch = textDisplay
         .toLowerCase()
@@ -365,7 +384,7 @@ export const WellnessBuilder = ({
 
       return matchesSearch && matchesPrevention && matchesDomain;
     });
-  }, [activeCategoryData, searchTerm, filterPrevention, filterDomain]);
+  }, [activeTab, allInterventions, activeCategoryData, searchTerm, filterPrevention, filterDomain]);
 
   // Filter Logic for Referrals
   const filteredReferrals = useMemo(() => {
@@ -508,24 +527,24 @@ export const WellnessBuilder = ({
         <div className="flex flex-wrap gap-1.5">
           <span
             className={`px-2 py-0.5 rounded text-xs font-medium ${isSelected
-                ? "bg-indigo-500/30 text-indigo-200"
-                : "bg-indigo-50 text-indigo-700"
+              ? "bg-indigo-500/30 text-indigo-200"
+              : "bg-indigo-50 text-indigo-700"
               }`}
           >
             {item.strategyType}
           </span>
           <span
             className={`px-2 py-0.5 rounded text-xs font-medium ${isSelected
-                ? "bg-purple-500/30 text-purple-200"
-                : "bg-purple-50 text-purple-700"
+              ? "bg-purple-500/30 text-purple-200"
+              : "bg-purple-50 text-purple-700"
               }`}
           >
             {formatLabel(item.sdohCategory)}
           </span>
           <span
             className={`px-2 py-0.5 rounded text-xs font-medium ${isSelected
-                ? "bg-slate-600 text-slate-200"
-                : qualityColors[item.quality] || "bg-slate-100 text-slate-600"
+              ? "bg-slate-600 text-slate-200"
+              : qualityColors[item.quality] || "bg-slate-100 text-slate-600"
               }`}
           >
             {item.quality}
@@ -689,8 +708,56 @@ export const WellnessBuilder = ({
   const individualCount = selectedInterventions.length;
   const referralCount = selectedReferrals.length;
 
+  // Calculate spent resources
+  const spent = useMemo(() => {
+    let visits = 0;
+    let clinicalTime = 0;
+    let money = 0;
+    let effort = 0;
+
+    // Sum intervention costs
+    selectedInterventions.forEach((i) => {
+      if (i.cost) {
+        visits += i.cost.visits || 0;
+        clinicalTime += i.cost.clinicalTime || 0;
+        money += i.cost.money || 0;
+        effort += i.cost.effort || 0;
+      }
+    });
+
+    // Sum referral costs
+    selectedReferrals.forEach((r) => {
+      if (r.cost) {
+        visits += r.cost.visits || 0;
+        clinicalTime += r.cost.clinicalTime || 0;
+        money += r.cost.money || 0;
+        effort += r.cost.effort || 0;
+      }
+    });
+
+    return { visits, clinicalTime, money, effort };
+  }, [selectedInterventions, selectedReferrals]);
+
+  // Calculate total wellness gain (impact) for efficiency score
+  const wellnessGain = useMemo(() => {
+    const intGain = selectedInterventions.reduce((sum, i) => sum + i.impact, 0);
+    const refGain = selectedReferrals.reduce((sum, r) => sum + r.impact, 0);
+    return intGain + refGain;
+  }, [selectedInterventions, selectedReferrals]);
+
   return (
     <div className="mt-8 space-y-8">
+      {/* Budget Dashboard (Gamified) */}
+      {budget && (
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <BudgetDashboard
+            budget={budget}
+            spent={spent}
+            wellnessGain={wellnessGain}
+          />
+        </div>
+      )}
+
       {/* Top Section: Plan Summary */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden">
         <div className="bg-slate-900 text-white p-6">
@@ -865,8 +932,8 @@ export const WellnessBuilder = ({
                 <button
                   onClick={() => setActiveLibrarySection("interventions")}
                   className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${activeLibrarySection === "interventions"
-                      ? "bg-white text-slate-800 shadow-sm"
-                      : "text-slate-500 hover:text-slate-700"
+                    ? "bg-white text-slate-800 shadow-sm"
+                    : "text-slate-500 hover:text-slate-700"
                     }`}
                 >
                   Interventions
@@ -874,8 +941,8 @@ export const WellnessBuilder = ({
                 <button
                   onClick={() => setActiveLibrarySection("referrals")}
                   className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${activeLibrarySection === "referrals"
-                      ? "bg-white text-teal-700 shadow-sm"
-                      : "text-slate-500 hover:text-slate-700"
+                    ? "bg-white text-teal-700 shadow-sm"
+                    : "text-slate-500 hover:text-slate-700"
                     }`}
                 >
                   Referrals
@@ -883,8 +950,8 @@ export const WellnessBuilder = ({
                 <button
                   onClick={() => setActiveLibrarySection("population")}
                   className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-1 ${activeLibrarySection === "population"
-                      ? "bg-white text-purple-700 shadow-sm"
-                      : "text-slate-500 hover:text-slate-700"
+                    ? "bg-white text-purple-700 shadow-sm"
+                    : "text-slate-500 hover:text-slate-700"
                     }`}
                 >
                   <Globe className="w-3 h-3" />
@@ -915,6 +982,7 @@ export const WellnessBuilder = ({
                     value={activeTab}
                     onChange={(e) => setActiveTab(e.target.value)}
                   >
+                    <option value="all">All ICF Categories</option>
                     {categories.map((cat) => (
                       <option key={cat.id} value={cat.id}>
                         {cat.label}

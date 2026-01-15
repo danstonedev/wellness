@@ -36,6 +36,17 @@ export type InterventionQuality =
   | "Poor"
   | "Unsafe";
 
+// Cost structure for interventions (dual budget: therapist + patient)
+export interface ResourceCost {
+  // Therapist resources
+  visits?: number;        // Number of PT sessions required
+  clinicalTime?: number;  // Minutes of therapist time per session
+
+  // Patient resources
+  money?: number;         // Patient out-of-pocket cost ($)
+  effort?: number;        // Patient effort/fatigue cost (1-5 scale)
+}
+
 // Scenario-specific intervention option (references a master intervention by id)
 export interface InterventionOption {
   id?: string;
@@ -46,6 +57,7 @@ export interface InterventionOption {
   rationale: string;
   quality?: InterventionQuality;
   isCustom?: boolean;
+  cost?: ResourceCost;
 }
 
 // Resolved intervention used by UI/selection (alias for clarity)
@@ -175,6 +187,7 @@ export interface ReferralOption {
   prevention: PreventionLevelName;
   rationale: string;
   quality: InterventionQuality;
+  cost?: ResourceCost;
 }
 
 // Knowledge check question for post-case assessment
@@ -190,6 +203,17 @@ export interface KnowledgeCheckQuestion {
   stem: string;
   options: KnowledgeCheckOption[];
   category: 'prevention-level' | 'clinical-reasoning' | 'safety' | 'priority-setting';
+}
+
+// Budget constraints for a population/case (dual: therapist + patient)
+export interface PopulationBudget {
+  // Therapist resources
+  visits: number;        // Authorized PT sessions
+  clinicalTime: number;  // Total minutes available
+
+  // Patient resources
+  money: number;         // Patient out-of-pocket limit ($)
+  effort: number;        // Max patient effort/fatigue (points)
 }
 
 // Full population/case study
@@ -215,6 +239,8 @@ export interface Population {
   targetDomains?: WellnessDomainName[]; // Priority domains for this case (2x scoring)
   // Knowledge check
   knowledgeCheckQuestions?: KnowledgeCheckQuestion[];
+  // Budget constraints
+  budget?: PopulationBudget;
 }
 
 // Population Plan Score (out of 100)
@@ -235,4 +261,8 @@ export interface Results {
   unsafePenalty?: number;
   unsafeInterventions?: string[];
   criticalNeedsAddressed?: boolean;
+  // Resource tracking
+  budget?: PopulationBudget;
+  spent?: ResourceCost;
+  wellnessGain?: number;
 }
