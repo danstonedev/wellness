@@ -29,7 +29,6 @@ import type {
   PopulationStrategyType,
   SDOHCategory,
 } from "../../types";
-import { PlanAnalysisPanel } from "./PlanAnalysisPanel";
 
 interface WellnessBuilderProps {
   selectedInterventions: Intervention[];

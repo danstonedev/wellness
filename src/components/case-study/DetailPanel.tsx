@@ -1,22 +1,14 @@
-import { BookOpen, Plus, Check } from "lucide-react";
-import type { ICFCategory, Intervention } from "../../types";
+import { BookOpen } from "lucide-react";
+import type { ICFCategory } from "../../types";
 
 interface DetailPanelProps {
   data: ICFCategory | null;
   category: string;
-  onToggle: (intervention: Intervention) => void;
-  selectedInterventions: Intervention[];
-  maxSelection: number;
-  submitted: boolean;
 }
 
 export const DetailPanel = ({
   data,
   category,
-  onToggle,
-  selectedInterventions = [],
-  maxSelection = 5,
-  submitted = false,
 }: DetailPanelProps) => {
   if (!data) return null;
 

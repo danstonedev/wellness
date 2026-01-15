@@ -22,7 +22,40 @@ interface SDOHPanelProps {
   embedded?: boolean;
 }
 
-// ... existing code ...
+type SDOHCategory =
+  | "Housing"
+  | "Food"
+  | "Transportation"
+  | "Financial"
+  | "Safety"
+  | "Social"
+  | "Education"
+  | "Employment"
+  | "Healthcare Access";
+
+const categoryIcons: Record<SDOHCategory, React.ReactNode> = {
+  Housing: <Home className="w-4 h-4" />,
+  Food: <UtensilsCrossed className="w-4 h-4" />,
+  Transportation: <Car className="w-4 h-4" />,
+  Financial: <DollarSign className="w-4 h-4" />,
+  Safety: <Shield className="w-4 h-4" />,
+  Social: <Users className="w-4 h-4" />,
+  Education: <GraduationCap className="w-4 h-4" />,
+  Employment: <Briefcase className="w-4 h-4" />,
+  "Healthcare Access": <HeartPulse className="w-4 h-4" />,
+};
+
+const severityColors: Record<HRSNIndicator["severity"], string> = {
+  High: "bg-red-100 text-red-800 border-red-200",
+  Moderate: "bg-amber-100 text-amber-800 border-amber-200",
+  Low: "bg-slate-100 text-slate-700 border-slate-200",
+};
+
+const severityDots: Record<HRSNIndicator["severity"], string> = {
+  High: "bg-red-500",
+  Moderate: "bg-amber-500",
+  Low: "bg-slate-400",
+};
 
 export const SDOHPanel = ({
   sdohFactors = [],
