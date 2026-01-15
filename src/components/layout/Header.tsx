@@ -13,7 +13,7 @@ export const Header = ({ setView }: HeaderProps) => (
             >
                 <Layout className="w-6 h-6 text-blue-400" />
                 <h1 className="text-xl font-bold tracking-tight">
-                    DAPT Wellness <span className="text-blue-400">ICF</span>
+                    DPT Wellness <span className="text-blue-400">ICF</span>
                 </h1>
             </div>
             <nav className="hidden md:flex space-x-6 text-sm font-medium">
