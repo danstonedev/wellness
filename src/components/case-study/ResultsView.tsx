@@ -1,7 +1,6 @@
 import {
   Trophy,
   ShieldAlert,
-  ShieldCheck,
   FileText,
   AlertTriangle,
   CheckCircle,
@@ -15,6 +14,7 @@ import {
   Activity,
 } from "lucide-react";
 import { preventionLevels } from "../../data/preventionLevels";
+import { UMatterScorecard } from "../ui/UMatterScorecard";
 import type {
   Intervention,
   WellnessDomainName,
@@ -22,6 +22,7 @@ import type {
   PopulationIntervention,
   PopulationPlanScore,
   PopulationStrategyType,
+  WellnessAnswers,
 } from "../../types";
 
 interface ResultsViewProps {
@@ -35,6 +36,14 @@ interface ResultsViewProps {
   addressedCriticalNeeds?: string[];
   selectedPopulationInterventions?: PopulationIntervention[];
   populationScore?: PopulationPlanScore;
+  targetDomains?: WellnessDomainName[];
+  // Scorecard props
+  patientName: string;
+  wellnessAnswers?: WellnessAnswers;
+  // Safety tracking
+  unsafePenalty?: number;
+  unsafeInterventions?: string[];
+  criticalNeedsAddressed?: boolean;
 }
 
 export const ResultsView = ({
@@ -48,6 +57,12 @@ export const ResultsView = ({
   addressedCriticalNeeds = [],
   selectedPopulationInterventions = [],
   populationScore,
+  targetDomains = [],
+  patientName,
+  wellnessAnswers,
+  unsafePenalty = 0,
+  unsafeInterventions = [],
+  criticalNeedsAddressed = true,
 }: ResultsViewProps) => {
   const studentTotal = Object.values(studentResults).reduce((a, b) => a + b, 0);
   const baselineTotal = Object.values(baseline).reduce((a, b) => a + b, 0);
@@ -55,7 +70,22 @@ export const ResultsView = ({
 
   const studentGain = studentTotal - baselineTotal;
   const maxGain = maxTotal - baselineTotal;
-  const performancePct = Math.round((studentGain / maxGain) * 100) || 0;
+
+  // SAFETY-ADJUSTED SCORING
+  // 1. Apply unsafe intervention penalty (-10 each)
+  const adjustedGain = Math.max(0, studentGain - unsafePenalty);
+
+  // 2. If critical needs not addressed, cap at 50% of max gain
+  const safetyCapApplied = !criticalNeedsAddressed;
+  const cappedGain = safetyCapApplied
+    ? Math.min(adjustedGain, maxGain * 0.5)
+    : adjustedGain;
+
+  const performancePct = Math.round((cappedGain / maxGain) * 100) || 0;
+
+  // Safety status flags
+  const hasSafetyIssues = unsafeInterventions.length > 0 || !criticalNeedsAddressed;
+  const hasUnsafeChoices = unsafeInterventions.length > 0;
 
   // Identify choice types
   const dangerousChoices = selectedInterventions.filter(
@@ -72,21 +102,33 @@ export const ResultsView = ({
     if (i.prevention) prevCounts[i.prevention]++;
   });
 
+  // SAFETY-FIRST FEEDBACK
   let feedback = "";
   let feedbackColor = "";
+  let feedbackSubtext = "";
 
-  if (dangerousChoices.length > 0) {
-    feedback = "Critical Safety Issues Identified";
+  if (hasSafetyIssues) {
+    feedback = "⚠️ Plan Cannot Be Approved";
     feedbackColor = "bg-red-700";
+    if (!criticalNeedsAddressed && hasUnsafeChoices) {
+      feedbackSubtext = "Critical needs unaddressed AND unsafe interventions selected";
+    } else if (!criticalNeedsAddressed) {
+      feedbackSubtext = "Critical patient safety needs were not addressed";
+    } else {
+      feedbackSubtext = `${unsafeInterventions.length} potentially harmful intervention${unsafeInterventions.length > 1 ? 's' : ''} selected`;
+    }
   } else if (performancePct >= 90) {
-    feedback = "Excellent Clinical Reasoning";
+    feedback = "✓ Excellent Clinical Reasoning";
     feedbackColor = "bg-emerald-700";
+    feedbackSubtext = "Patient safety addressed, optimal wellness impact achieved";
   } else if (performancePct >= 70) {
-    feedback = "Good Plan with Minor Gaps";
+    feedback = "✓ Good Plan — Minor Improvements Possible";
     feedbackColor = "bg-blue-700";
+    feedbackSubtext = "Safety needs addressed, some optimization opportunities remain";
   } else {
     feedback = "Plan Needs Revision";
     feedbackColor = "bg-amber-600";
+    feedbackSubtext = "Consider different intervention priorities";
   }
 
   // Helper functions for population display
@@ -106,25 +148,36 @@ export const ResultsView = ({
       .join(" ");
   };
 
-  // Check if all critical needs are addressed
-  const allCriticalAddressed = criticalNeeds
-    ? criticalNeeds.every((need) => addressedCriticalNeeds.includes(need.id))
-    : true;
+  // Check if all critical needs are addressed (for display)
+  const allCriticalAddressed = criticalNeedsAddressed;
 
   return (
     <div className="mt-8 bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden animate-in zoom-in-95">
       <div className={`p-6 text-center text-white ${feedbackColor}`}>
         <div className="flex justify-center mb-2">
-          {dangerousChoices.length > 0 ? (
+          {hasSafetyIssues ? (
             <ShieldAlert className="w-12 h-12" />
           ) : (
             <Trophy className="w-12 h-12 text-yellow-300" />
           )}
         </div>
         <h3 className="text-2xl font-bold">{feedback}</h3>
-        <p className="text-white/80">
-          Simulated Outcome: {performancePct}% of Potential Wellness Gain
-        </p>
+        <p className="text-white/90 text-sm mt-1">{feedbackSubtext}</p>
+        <div className="mt-3 flex justify-center gap-4 text-sm">
+          <span className="bg-white/20 px-3 py-1 rounded-full">
+            Score: {performancePct}%
+          </span>
+          {unsafePenalty > 0 && (
+            <span className="bg-red-900/50 px-3 py-1 rounded-full">
+              Safety Penalty: -{unsafePenalty} pts
+            </span>
+          )}
+          {safetyCapApplied && (
+            <span className="bg-red-900/50 px-3 py-1 rounded-full">
+              Capped at 50% (critical needs unmet)
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="p-8">
@@ -144,9 +197,8 @@ export const ResultsView = ({
               Your Plan
             </div>
             <div
-              className={`text-3xl font-bold ${
-                dangerousChoices.length > 0 ? "text-red-600" : "text-blue-700"
-              }`}
+              className={`text-3xl font-bold ${dangerousChoices.length > 0 ? "text-red-600" : "text-blue-700"
+                }`}
             >
               {studentTotal}
             </div>
@@ -163,118 +215,137 @@ export const ResultsView = ({
           </div>
         </div>
 
-        {/* Prevention Spectrum Breakdown */}
-        <div className="mb-8 border rounded-xl p-4 bg-slate-50">
-          <h4 className="text-sm font-bold text-slate-700 mb-3 flex items-center">
-            <ShieldCheck className="w-4 h-4 mr-2" /> Plan Composition
-            (Prevention Levels)
-          </h4>
-          <div className="flex h-4 w-full rounded-full overflow-hidden mb-2">
-            {prevCounts.Primary > 0 && (
-              <div
-                className="bg-teal-500"
-                style={{
-                  width: `${
-                    (prevCounts.Primary / selectedInterventions.length) * 100
-                  }%`,
-                }}
-              />
-            )}
-            {prevCounts.Secondary > 0 && (
-              <div
-                className="bg-purple-500"
-                style={{
-                  width: `${
-                    (prevCounts.Secondary / selectedInterventions.length) * 100
-                  }%`,
-                }}
-              />
-            )}
-            {prevCounts.Tertiary > 0 && (
-              <div
-                className="bg-blue-500"
-                style={{
-                  width: `${
-                    (prevCounts.Tertiary / selectedInterventions.length) * 100
-                  }%`,
-                }}
-              />
-            )}
-          </div>
-          <div className="flex text-xs space-x-4 justify-center">
-            <span className="flex items-center">
-              <div className="w-2 h-2 rounded-full bg-teal-500 mr-1" /> 1°:{" "}
-              {prevCounts.Primary}
-            </span>
-            <span className="flex items-center">
-              <div className="w-2 h-2 rounded-full bg-purple-500 mr-1" /> 2°:{" "}
-              {prevCounts.Secondary}
-            </span>
-            <span className="flex items-center">
-              <div className="w-2 h-2 rounded-full bg-blue-500 mr-1" /> 3°:{" "}
-              {prevCounts.Tertiary}
-            </span>
-          </div>
+        {/* Wellness Self-Assessment Scorecard */}
+        <div className="mb-8">
+          <UMatterScorecard
+            scores={baseline}
+            newScores={studentResults}
+            name={patientName}
+            wellnessAnswers={wellnessAnswers}
+          />
         </div>
 
-        {/* Critical Needs Assessment */}
+        {/* SAFETY-FIRST: Critical Needs Assessment - Now shown prominently */}
         {criticalNeeds && criticalNeeds.length > 0 && (
           <div
-            className={`mb-8 rounded-xl p-5 border ${
-              allCriticalAddressed
-                ? "bg-green-50 border-green-200"
-                : "bg-red-50 border-red-200"
-            }`}
+            className={`mb-8 rounded-xl p-5 border-2 ${allCriticalAddressed
+              ? "bg-green-50 border-green-300"
+              : "bg-red-50 border-red-400 shadow-lg"
+              }`}
           >
             <h4
-              className={`flex items-center font-bold mb-4 ${
-                allCriticalAddressed ? "text-green-900" : "text-red-900"
-              }`}
+              className={`flex items-center font-bold text-lg mb-4 ${allCriticalAddressed ? "text-green-900" : "text-red-900"
+                }`}
             >
               {allCriticalAddressed ? (
                 <>
-                  <CheckCircle className="w-5 h-5 mr-2" /> Critical Needs: All
-                  Addressed
+                  <CheckCircle className="w-6 h-6 mr-2" /> Patient Safety: All Critical Needs Addressed
                 </>
               ) : (
                 <>
-                  <AlertTriangle className="w-5 h-5 mr-2" /> Critical Needs
-                  Assessment
+                  <AlertTriangle className="w-6 h-6 mr-2" /> ⚠️ Patient Safety Concerns
                 </>
               )}
             </h4>
+
+            {!allCriticalAddressed && (
+              <div className="bg-red-100 border border-red-300 rounded-lg p-3 mb-4">
+                <p className="text-red-800 text-sm font-medium">
+                  <strong>Scoring Impact:</strong> Score capped at 50% because critical patient safety needs were not addressed.
+                  In clinical practice, these oversights could result in adverse patient outcomes.
+                </p>
+              </div>
+            )}
+
             <div className="space-y-2">
               {criticalNeeds.map((need) => {
                 const isAddressed = addressedCriticalNeeds.includes(need.id);
                 return (
                   <div
                     key={need.id}
-                    className={`p-3 rounded-lg ${
-                      isAddressed ? "bg-green-100" : "bg-red-100"
-                    }`}
+                    className={`p-3 rounded-lg border ${isAddressed
+                      ? "bg-green-100 border-green-300"
+                      : "bg-red-100 border-red-300"
+                      }`}
                   >
                     <div className="font-medium text-sm">
                       {need.description}
                     </div>
                     <div
-                      className={`text-xs mt-1 ${
-                        isAddressed ? "text-green-700" : "text-red-700"
-                      }`}
+                      className={`text-xs mt-1 font-medium ${isAddressed ? "text-green-700" : "text-red-700"
+                        }`}
                     >
                       {isAddressed
                         ? "✓ Addressed in your plan"
-                        : "✗ Not addressed - requires intervention or referral"}
+                        : "✗ NOT ADDRESSED — requires intervention or referral"}
                     </div>
                   </div>
                 );
               })}
             </div>
-            {!allCriticalAddressed && (
-              <p className="text-xs text-red-700 mt-3 italic">
-                Note: All critical needs must be addressed for optimal patient
-                outcomes.
+          </div>
+        )}
+
+        {/* Unsafe Interventions Warning */}
+        {unsafeInterventions.length > 0 && (
+          <div className="mb-8 rounded-xl p-5 border-2 bg-red-50 border-red-400 shadow-lg">
+            <h4 className="flex items-center font-bold text-lg mb-3 text-red-900">
+              <ShieldAlert className="w-6 h-6 mr-2" /> ⚠️ Potentially Harmful Interventions Selected
+            </h4>
+            <div className="bg-red-100 border border-red-300 rounded-lg p-3 mb-4">
+              <p className="text-red-800 text-sm font-medium">
+                <strong>Scoring Impact:</strong> -{unsafePenalty} points penalty applied.
+                These interventions are contraindicated or potentially harmful for this patient.
               </p>
-            )}
+            </div>
+            <div className="space-y-2">
+              {selectedInterventions
+                .filter((i) => i.quality === "Unsafe")
+                .map((intervention) => (
+                  <div
+                    key={intervention.id}
+                    className="p-3 rounded-lg bg-red-100 border border-red-300"
+                  >
+                    <div className="font-medium text-sm text-red-900">
+                      {formatLabel(intervention.id || "")}
+                    </div>
+                    <div className="text-xs mt-1 text-red-700">
+                      {intervention.rationale}
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
+
+        {/* Target Domains - Priority Focus Areas */}
+        {targetDomains.length > 0 && (
+          <div className="mb-8 border rounded-xl p-4 bg-amber-50 border-amber-200">
+            <h4 className="text-sm font-bold text-amber-800 mb-3 flex items-center">
+              🎯 Priority Target Domains
+              <span className="ml-2 text-xs font-normal text-amber-600">(2x scoring bonus)</span>
+            </h4>
+            <div className="flex flex-wrap gap-2 mb-3">
+              {targetDomains.map((domain) => {
+                // Check if any selected intervention matches this target domain
+                const hasMatch = selectedInterventions.some(i => i.domain === domain);
+                return (
+                  <span
+                    key={domain}
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-1 ${hasMatch
+                      ? "bg-green-100 text-green-800 border border-green-300"
+                      : "bg-amber-100 text-amber-800 border border-amber-300"
+                      }`}
+                  >
+                    {hasMatch && <CheckCircle className="w-3.5 h-3.5" />}
+                    {domain}
+                  </span>
+                );
+              })}
+            </div>
+            <p className="text-xs text-amber-700">
+              Interventions targeting these domains receive double points for this case.
+            </p>
           </div>
         )}
 
@@ -355,15 +426,14 @@ export const ResultsView = ({
                           {intervention.sdohCategory}
                         </span>
                         <span
-                          className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                            intervention.quality === "Excellent"
-                              ? "bg-green-100 text-green-700"
-                              : intervention.quality === "Good"
+                          className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${intervention.quality === "Excellent"
+                            ? "bg-green-100 text-green-700"
+                            : intervention.quality === "Good"
                               ? "bg-blue-100 text-blue-700"
                               : intervention.quality === "OK"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-slate-100 text-slate-700"
-                          }`}
+                                ? "bg-yellow-100 text-yellow-700"
+                                : "bg-slate-100 text-slate-700"
+                            }`}
                         >
                           {intervention.quality}
                         </span>
@@ -376,15 +446,14 @@ export const ResultsView = ({
 
             {/* Score Interpretation */}
             <div
-              className={`p-3 rounded-lg text-sm ${
-                populationScore.total >= 80
-                  ? "bg-green-100 text-green-800"
-                  : populationScore.total >= 60
+              className={`p-3 rounded-lg text-sm ${populationScore.total >= 80
+                ? "bg-green-100 text-green-800"
+                : populationScore.total >= 60
                   ? "bg-blue-100 text-blue-800"
                   : populationScore.total >= 40
-                  ? "bg-yellow-100 text-yellow-800"
-                  : "bg-orange-100 text-orange-800"
-              }`}
+                    ? "bg-yellow-100 text-yellow-800"
+                    : "bg-orange-100 text-orange-800"
+                }`}
             >
               {populationScore.total >= 80 ? (
                 <span>
@@ -470,15 +539,14 @@ export const ResultsView = ({
                   <CheckCircle className="w-4 h-4 mr-2" /> {choice.text}
                   {choice.prevention && (
                     <span
-                      className={`ml-2 text-[10px] px-1.5 py-0.5 rounded border ${
-                        preventionLevels[choice.prevention].color
-                      }`}
+                      className={`ml-2 text-[10px] px-1.5 py-0.5 rounded border ${preventionLevels[choice.prevention].color
+                        }`}
                     >
                       {choice.prevention === "Primary"
                         ? "1°"
                         : choice.prevention === "Secondary"
-                        ? "2°"
-                        : "3°"}
+                          ? "2°"
+                          : "3°"}
                     </span>
                   )}
                 </div>

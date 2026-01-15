@@ -641,6 +641,101 @@ export const populations: Population[] = [
         ],
       },
     },
+    targetDomains: ["Physical", "Environmental", "Social"],
+    knowledgeCheckQuestions: [
+      {
+        id: "eleanor-q1",
+        stem: "Which intervention would BEST address Eleanor's most immediate safety concern?",
+        options: [
+          {
+            letter: 'A', text: "Osteoporosis support group", isCorrect: false,
+            rationale: "While beneficial for emotional support, this does not address the immediate fall risk from home hazards."
+          },
+          {
+            letter: 'B', text: "Home safety audit and modification", isCorrect: true,
+            rationale: "Correct! Environmental hazards (steep stairs, no grab bars, throw rugs) pose immediate fall risk. Addressing these is secondary prevention of injury."
+          },
+          {
+            letter: 'C', text: "Calcium and vitamin D counseling", isCorrect: false,
+            rationale: "Important for bone health but does not address the immediate environmental fall hazards."
+          },
+          {
+            letter: 'D', text: "Silver Sneakers membership", isCorrect: false,
+            rationale: "Primary prevention activity that is beneficial but doesn't address current home hazards."
+          },
+        ],
+        category: 'priority-setting',
+      },
+      {
+        id: "eleanor-q2",
+        stem: "Why is Eleanor's fluid restriction a critical concern beyond simple hydration?",
+        options: [
+          {
+            letter: 'A', text: "It increases medication side effects", isCorrect: false,
+            rationale: "While hydration can affect some medications, this is not the primary concern here."
+          },
+          {
+            letter: 'B', text: "It worsens her osteoporosis", isCorrect: false,
+            rationale: "Dehydration does not directly affect bone density."
+          },
+          {
+            letter: 'C', text: "It paradoxically increases nocturia-related fall risk", isCorrect: true,
+            rationale: "Correct! Fluid restriction can worsen urge incontinence symptoms and concentrate urine, leading to more urgent nighttime bathroom trips and increased fall risk."
+          },
+          {
+            letter: 'D', text: "It causes cognitive decline affecting judgment", isCorrect: false,
+            rationale: "While severe dehydration can affect cognition, this is not the primary concern in this case."
+          },
+        ],
+        category: 'clinical-reasoning',
+      },
+      {
+        id: "eleanor-q3",
+        stem: "Which referral is MOST critical for addressing Eleanor's urge incontinence and its downstream effects?",
+        options: [
+          {
+            letter: 'A', text: "Geriatrics for polypharmacy review", isCorrect: false,
+            rationale: "Helpful but does not directly address the incontinence causing fluid restriction."
+          },
+          {
+            letter: 'B', text: "Psychology for fear of falling", isCorrect: false,
+            rationale: "Important for emotional wellbeing but does not address the physiological cause."
+          },
+          {
+            letter: 'C', text: "Urology or Pelvic Floor PT", isCorrect: true,
+            rationale: "Correct! Urge incontinence is driving her dangerous fluid restriction behavior. Treating the cause addresses the root problem."
+          },
+          {
+            letter: 'D', text: "Area Agency on Aging for meal delivery", isCorrect: false,
+            rationale: "Supportive for nutrition but unrelated to incontinence management."
+          },
+        ],
+        category: 'clinical-reasoning',
+      },
+      {
+        id: "eleanor-q4",
+        stem: "High-velocity spinal flexion exercises (crunches) are contraindicated in Eleanor because they:",
+        options: [
+          {
+            letter: 'A', text: "Increase blood pressure dangerously", isCorrect: false,
+            rationale: "While Valsalva maneuvers can raise BP, this is not the primary concern."
+          },
+          {
+            letter: 'B', text: "Significantly increase vertebral compression fracture risk", isCorrect: true,
+            rationale: "Correct! In patients with osteoporosis (especially with existing spondylolisthesis), spinal flexion under load dramatically increases fracture risk. This is a safety issue that must be caught."
+          },
+          {
+            letter: 'C', text: "Worsen her vestibular dysfunction", isCorrect: false,
+            rationale: "Position changes might affect vestibular symptoms but this is not why flexion exercises are dangerous."
+          },
+          {
+            letter: 'D', text: "Aggravate her incontinence symptoms", isCorrect: false,
+            rationale: "Increased intra-abdominal pressure could affect pelvic floor but this is not the primary contraindication."
+          },
+        ],
+        category: 'safety',
+      },
+    ],
   },
   {
     id: "neuro",
@@ -1116,6 +1211,101 @@ export const populations: Population[] = [
         ],
       },
     },
+    targetDomains: ["Emotional", "Occupational", "Physical"],
+    knowledgeCheckQuestions: [
+      {
+        id: "marcus-q1",
+        stem: "What is the MOST critical medical priority for Marcus given his cardiovascular risk profile?",
+        options: [
+          {
+            letter: 'A', text: "Improve gait speed for community ambulation", isCorrect: false,
+            rationale: "While important for function, this does not address the immediate medical risk."
+          },
+          {
+            letter: 'B', text: "Prevent recurrent stroke through aggressive risk factor management", isCorrect: true,
+            rationale: "Correct! With A1c 7.8%, HTN, and HLD, Marcus is at high risk for a second stroke. Secondary prevention is the top medical priority - endocrinology referral is critical."
+          },
+          {
+            letter: 'C', text: "Address spasticity in the right upper extremity", isCorrect: false,
+            rationale: "Spasticity management helps function but doesn't address the life-threatening recurrence risk."
+          },
+          {
+            letter: 'D', text: "Restore driving independence for work participation", isCorrect: false,
+            rationale: "Important for quality of life and occupational wellness, but not the top medical priority."
+          },
+        ],
+        category: 'priority-setting',
+      },
+      {
+        id: "marcus-q2",
+        stem: "Marcus is showing signs of situational depression. Why is psychology referral considered essential rather than optional?",
+        options: [
+          {
+            letter: 'A', text: "Depression is common post-stroke and requires medication", isCorrect: false,
+            rationale: "While depression is common, not all cases require medication and this doesn't capture why it's essential."
+          },
+          {
+            letter: 'B', text: "Untreated depression impairs neuroplasticity, rehabilitation engagement, and secondary prevention adherence", isCorrect: true,
+            rationale: "Correct! Depression directly impacts brain recovery through neuroplasticity mechanisms and reduces motivation for exercise, medication compliance, and healthy behaviors that prevent recurrence."
+          },
+          {
+            letter: 'C', text: "His wife cannot continue as sole caregiver without support", isCorrect: false,
+            rationale: "Caregiver burden is a concern but psychology referral is for Marcus's direct mental health needs."
+          },
+          {
+            letter: 'D', text: "Insurance requires mental health screening post-stroke", isCorrect: false,
+            rationale: "Insurance requirements don't drive clinical necessity."
+          },
+        ],
+        category: 'clinical-reasoning',
+      },
+      {
+        id: "marcus-q3",
+        stem: "Why are overhead shoulder pulleys CONTRAINDICATED for Marcus?",
+        options: [
+          {
+            letter: 'A', text: "They increase spasticity in elbow flexors", isCorrect: false,
+            rationale: "While pulleys might trigger stretch reflexes, this is not the primary contraindication."
+          },
+          {
+            letter: 'B', text: "His cardiovascular status cannot tolerate the exercise intensity", isCorrect: false,
+            rationale: "Overhead pulleys are not particularly intense cardiovascular exercise."
+          },
+          {
+            letter: 'C', text: "They risk shoulder impingement and worsening of subluxation", isCorrect: true,
+            rationale: "Correct! With 1 finger breadth subluxation and likely rotator cuff weakness, overhead pulleys can worsen subluxation and cause impingement injury."
+          },
+          {
+            letter: 'D', text: "The bilateral movement pattern reinforces synergy patterns", isCorrect: false,
+            rationale: "While synergies are a concern in neurological rehab, this is not why pulleys are specifically contraindicated."
+          },
+        ],
+        category: 'safety',
+      },
+      {
+        id: "marcus-q4",
+        stem: "Which intervention BEST addresses Marcus's identity crisis and loss of his 'athlete' self-concept?",
+        options: [
+          {
+            letter: 'A', text: "Disability benefits navigation", isCorrect: false,
+            rationale: "This is practical but reinforces limitations rather than restoring identity."
+          },
+          {
+            letter: 'B', text: "Resignation to 'new normal' and acceptance of limits", isCorrect: false,
+            rationale: "This represents a fixed mindset that harms recovery - it's actually a harmful distractor option."
+          },
+          {
+            letter: 'C', text: "Adaptive sports programs and finding new athletic identity", isCorrect: true,
+            rationale: "Correct! Adaptive hiking, cycling, or sports programs allows Marcus to reclaim his athlete identity through modification rather than loss. This supports emotional wellness and neuroplasticity through exercise."
+          },
+          {
+            letter: 'D', text: "Stress ball exercises for grip strength", isCorrect: false,
+            rationale: "This is a low-value intervention that may reinforce spasticity and doesn't address the identity dimension."
+          },
+        ],
+        category: 'clinical-reasoning',
+      },
+    ],
   },
   {
     id: "peds",
@@ -1600,6 +1790,101 @@ export const populations: Population[] = [
         ],
       },
     },
+    targetDomains: ["Emotional", "Social", "Occupational"],
+    knowledgeCheckQuestions: [
+      {
+        id: "leo-q1",
+        stem: "Leo's parents are asking about the BEST physical activity option for their son. Which recommendation demonstrates inclusive, family-centered practice?",
+        options: [
+          {
+            letter: 'A', text: "Intensive one-on-one therapy sessions 5x/week to maximize motor gains", isCorrect: false,
+            rationale: "This intensive approach may cause burnout and reduces time for play and social development."
+          },
+          {
+            letter: 'B', text: "Adaptive sports leagues that include peers with and without disabilities", isCorrect: true,
+            rationale: "Correct! Inclusive adaptive sports address physical activity, social participation, and emotional wellness simultaneously while promoting Leo's identity as an athlete rather than a 'patient.'"
+          },
+          {
+            letter: 'C', text: "Home exercise program exclusively to avoid comparison with typical peers", isCorrect: false,
+            rationale: "Isolation harms social development and emotional wellness; children benefit from peer interaction."
+          },
+          {
+            letter: 'D', text: "Wait until spasticity is better controlled before starting physical activity", isCorrect: false,
+            rationale: "Delaying activity worsens deconditioning and misses critical developmental windows."
+          },
+        ],
+        category: 'clinical-reasoning',
+      },
+      {
+        id: "leo-q2",
+        stem: "Why is addressing screen time and sedentary behavior particularly important for children with CP like Leo?",
+        options: [
+          {
+            letter: 'A', text: "It prevents seizures common in CP", isCorrect: false,
+            rationale: "While some children with CP have seizures, screen time is not the primary trigger."
+          },
+          {
+            letter: 'B', text: "Sedentary behavior compounds spasticity, weakness, contracture risk, and metabolic issues", isCorrect: true,
+            rationale: "Correct! Children with CP already have movement limitations; excessive sedentary time accelerates muscle shortening, weakening, and increases obesity/metabolic risk disproportionately."
+          },
+          {
+            letter: 'C', text: "Screen time causes behavioral problems unique to CP", isCorrect: false,
+            rationale: "While excessive screen time affects all children's behavior, this is not specific to CP."
+          },
+          {
+            letter: 'D', text: "Parents need respite time without relying on screens", isCorrect: false,
+            rationale: "Caregiver respite is important but not the clinical reason to address sedentary behavior."
+          },
+        ],
+        category: 'clinical-reasoning',
+      },
+      {
+        id: "leo-q3",
+        stem: "The school is asking if Leo can participate in regular PE class. What approach represents BEST practice?",
+        options: [
+          {
+            letter: 'A', text: "Exempt Leo from PE entirely to prevent injury", isCorrect: false,
+            rationale: "Exclusion harms social development and physical conditioning; accommodations should allow participation."
+          },
+          {
+            letter: 'B', text: "Collaborate with school to develop IEP accommodations enabling modified participation", isCorrect: true,
+            rationale: "Correct! PT collaboration with schools to create individualized accommodation plans enables participation in the least restrictive environment - this is both legally required and best practice."
+          },
+          {
+            letter: 'C', text: "Place Leo in a separate adapted PE class with only students with disabilities", isCorrect: false,
+            rationale: "While sometimes appropriate, segregated settings should not be the default - inclusion with accommodations is preferred."
+          },
+          {
+            letter: 'D', text: "Have Leo participate without modifications to build resilience", isCorrect: false,
+            rationale: "This creates safety risks and potential for failure experiences that harm self-efficacy."
+          },
+        ],
+        category: 'priority-setting',
+      },
+      {
+        id: "leo-q4",
+        stem: "Leo's mother mentions he's been refusing to use his walker at school. What developmental factor is MOST important to consider?",
+        options: [
+          {
+            letter: 'A', text: "He is experiencing muscle fatigue from overuse", isCorrect: false,
+            rationale: "While fatigue is possible, the social context of 'at school' suggests a different primary factor."
+          },
+          {
+            letter: 'B', text: "The walker needs to be adjusted for proper fit", isCorrect: false,
+            rationale: "Equipment fit is important but doesn't explain school-specific refusal."
+          },
+          {
+            letter: 'C', text: "School-age children are highly sensitive to peer perception and social belonging", isCorrect: true,
+            rationale: "Correct! At age 8, peer acceptance becomes increasingly important. Leo may feel his walker makes him 'different.' Address emotional wellness by exploring his feelings and potentially involving peers in normalizing devices."
+          },
+          {
+            letter: 'D', text: "He is testing boundaries with authority figures", isCorrect: false,
+            rationale: "While testing limits is normal at this age, the context suggests social-emotional rather than behavioral factors."
+          },
+        ],
+        category: 'clinical-reasoning',
+      },
+    ],
   },
   {
     id: "sci_dm_homeless",
@@ -2195,5 +2480,100 @@ export const populations: Population[] = [
         ],
       },
     },
+    targetDomains: ["Environmental", "Social", "Physical"],
+    knowledgeCheckQuestions: [
+      {
+        id: "sam-q1",
+        stem: "Sam has multiple serious medical concerns: uncontrolled diabetes, early pressure injury, and he's currently sleeping in his wheelchair. What principle should guide your PRIORITY intervention?",
+        options: [
+          {
+            letter: 'A', text: "Address the diabetes first since A1c of 10.2% indicates poor control", isCorrect: false,
+            rationale: "While diabetes is critical, without addressing the environmental factors (sleeping in wheelchair), medical interventions will be ineffective."
+          },
+          {
+            letter: 'B', text: "Address housing instability first since it underlies all other health issues", isCorrect: true,
+            rationale: "Correct! Housing-first principles recognize that without stable housing, healthcare recommendations (medication storage, wound care, pressure relief) cannot be implemented. Address the foundational SDOH first."
+          },
+          {
+            letter: 'C', text: "Treat the pressure injury with wound care as an immediate medical need", isCorrect: false,
+            rationale: "The pressure injury will not heal if Sam continues sleeping in his wheelchair - you must address the cause."
+          },
+          {
+            letter: 'D', text: "Focus on PT strengthening since Sam's functional independence is key", isCorrect: false,
+            rationale: "Strengthening is important but won't address the social determinants driving health decline."
+          },
+        ],
+        category: 'priority-setting',
+      },
+      {
+        id: "sam-q2",
+        stem: "Sam mentions he hasn't been taking his metformin because he can't keep it safe on the street. What type of barrier is this?",
+        options: [
+          {
+            letter: 'A', text: "Health literacy barrier - he doesn't understand the importance", isCorrect: false,
+            rationale: "Sam understands the importance; he's making a necessary choice due to circumstances, not lack of knowledge."
+          },
+          {
+            letter: 'B', text: "Compliance barrier - he's choosing not to follow recommendations", isCorrect: false,
+            rationale: "'Non-compliance' is an outdated framework; this represents a structural/environmental barrier, not a behavioral one."
+          },
+          {
+            letter: 'C', text: "HRSN barrier - housing instability preventing medication management", isCorrect: true,
+            rationale: "Correct! This is a Health-Related Social Need. Without secure storage, refrigeration (for some medications), and consistent access, medication adherence is impossible regardless of motivation."
+          },
+          {
+            letter: 'D', text: "Transportation barrier - difficulty getting to the pharmacy", isCorrect: false,
+            rationale: "Sam has medication; the issue is storing and protecting it safely, not access to pharmacy."
+          },
+        ],
+        category: 'clinical-reasoning',
+      },
+      {
+        id: "sam-q3",
+        stem: "What is the MOST important reason to address Sam's emerging sacral pressure injury urgently?",
+        options: [
+          {
+            letter: 'A', text: "Pressure injuries cause pain and reduce quality of life", isCorrect: false,
+            rationale: "While true, this undersells the risk in an SCI patient."
+          },
+          {
+            letter: 'B', text: "In SCI with diabetes, wounds can progress to life-threatening osteomyelitis and sepsis rapidly", isCorrect: true,
+            rationale: "Correct! The combination of impaired sensation (can't feel worsening), impaired circulation (diabetes), and immune compromise creates a perfect storm for rapid wound deterioration. What starts as stage 1 can become septic within weeks."
+          },
+          {
+            letter: 'C', text: "Wounds require specialized PT modalities like electrical stimulation", isCorrect: false,
+            rationale: "While PT can help wound healing, this doesn't capture the urgency of the situation."
+          },
+          {
+            letter: 'D', text: "Insurance requires documentation of wound care for wheelchair approval", isCorrect: false,
+            rationale: "Administrative concerns don't drive clinical urgency."
+          },
+        ],
+        category: 'safety',
+      },
+      {
+        id: "sam-q4",
+        stem: "Sam cancels his third appointment in a row. Rather than labeling him 'non-compliant,' what approach represents trauma-informed, SDOH-aware care?",
+        options: [
+          {
+            letter: 'A', text: "Discharge him from the caseload for non-compliance", isCorrect: false,
+            rationale: "This punishes vulnerability and perpetuates healthcare avoidance - the opposite of therapeutic."
+          },
+          {
+            letter: 'B', text: "Explore barriers: Is he prioritizing shelter search over medical care? Does he have transportation?", isCorrect: true,
+            rationale: "Correct! Trauma-informed care recognizes that 'no-shows' often reflect competing survival priorities or barriers, not lack of motivation. Address the underlying causes rather than applying punitive labels."
+          },
+          {
+            letter: 'C', text: "Double-book his next appointment assuming he won't show", isCorrect: false,
+            rationale: "This deprioritizes his care and creates access barriers if he does come."
+          },
+          {
+            letter: 'D', text: "Require a deposit before scheduling future appointments", isCorrect: false,
+            rationale: "Financial barriers are already present for people experiencing homelessness - this would worsen access."
+          },
+        ],
+        category: 'clinical-reasoning',
+      },
+    ],
   },
 ];

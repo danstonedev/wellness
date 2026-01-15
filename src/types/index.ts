@@ -177,6 +177,21 @@ export interface ReferralOption {
   quality: InterventionQuality;
 }
 
+// Knowledge check question for post-case assessment
+export interface KnowledgeCheckOption {
+  letter: 'A' | 'B' | 'C' | 'D';
+  text: string;
+  isCorrect: boolean;
+  rationale: string;
+}
+
+export interface KnowledgeCheckQuestion {
+  id: string;
+  stem: string;
+  options: KnowledgeCheckOption[];
+  category: 'prevention-level' | 'clinical-reasoning' | 'safety' | 'priority-setting';
+}
+
 // Full population/case study
 export interface Population {
   id: string;
@@ -196,6 +211,10 @@ export interface Population {
   referralOptions?: ReferralOption[]; // Available referrals for this case
   // Population-level options
   populationInterventions?: PopulationIntervention[]; // Community/policy strategies
+  // Scoring targets
+  targetDomains?: WellnessDomainName[]; // Priority domains for this case (2x scoring)
+  // Knowledge check
+  knowledgeCheckQuestions?: KnowledgeCheckQuestion[];
 }
 
 // Population Plan Score (out of 100)
@@ -212,4 +231,8 @@ export interface Results {
   student: Record<WellnessDomainName, number>;
   max: Record<WellnessDomainName, number>;
   populationScore?: PopulationPlanScore;
+  // Safety tracking
+  unsafePenalty?: number;
+  unsafeInterventions?: string[];
+  criticalNeedsAddressed?: boolean;
 }

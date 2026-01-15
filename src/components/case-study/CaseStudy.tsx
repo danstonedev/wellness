@@ -11,9 +11,11 @@ import type {
 import { ICFCard } from "../ui/ICFCard";
 import { UMatterScorecard } from "../ui/UMatterScorecard";
 import { SDOHPanel } from "../ui/SDOHPanel";
+import { LearningObjectivesPanel } from "../ui/LearningObjectivesPanel";
 import { DetailPanel } from "./DetailPanel";
 import { WellnessBuilder } from "./WellnessBuilder";
 import { ResultsView } from "./ResultsView";
+import { KnowledgeCheckPanel } from "./KnowledgeCheckPanel";
 
 interface CaseStudyProps {
   population: Population;
@@ -44,19 +46,23 @@ export const CaseStudy = ({ population, onBack }: CaseStudyProps) => {
 
   const [submitted, setSubmitted] = useState(false);
   const [results, setResults] = useState<Results | null>(null);
+  const [showKnowledgeCheck, setShowKnowledgeCheck] = useState(false);
 
   const MAX_SELECTION = 5;
   const MAX_REFERRALS = 2;
   const MAX_POPULATION_SELECTION = 3;
 
-  // Calculate which critical needs have been addressed
+  // Calculate which critical needs have been addressed (includes both interventions AND referrals)
   const addressedCriticalNeeds = useMemo(() => {
     if (!population.criticalNeeds) return [];
-    const selectedIds = selectedInterventions.map((i) => i.id).filter(Boolean);
+    const selectedIds = [
+      ...selectedInterventions.map((i) => i.id),
+      ...selectedReferrals.map((r) => r.id),
+    ].filter(Boolean);
     return population.criticalNeeds
       .filter((need) => need.addressedBy.some((id) => selectedIds.includes(id)))
       .map((need) => need.id);
-  }, [selectedInterventions, population.criticalNeeds]);
+  }, [selectedInterventions, selectedReferrals, population.criticalNeeds]);
 
   const toggleIntervention = (intervention: Intervention) => {
     if (submitted) return;
@@ -138,7 +144,7 @@ export const CaseStudy = ({ population, onBack }: CaseStudyProps) => {
       'Poor': 5,
       'Unsafe': 0,
     };
-    const avgQuality = selectedPopulationInterventions.reduce((sum, i) => 
+    const avgQuality = selectedPopulationInterventions.reduce((sum, i) =>
       sum + (qualityValues[i.quality] || 10), 0) / selectedPopulationInterventions.length;
     const qualityScore = Math.round(avgQuality);
 
@@ -154,17 +160,30 @@ export const CaseStudy = ({ population, onBack }: CaseStudyProps) => {
   };
 
   const handleSubmit = () => {
-    // 1. Calculate Student Result
+    // 1. Calculate Student Result with Target Domain Weighting (2x for priority domains)
     const newScores = { ...population.patient.uMatterScores };
+    const targetDomains = population.targetDomains || [];
+
+    // Track unsafe interventions for penalty
+    const unsafeInterventions = selectedInterventions.filter(
+      (i) => i.quality === "Unsafe"
+    );
+    const unsafePenalty = unsafeInterventions.length * 10; // -10 per unsafe choice
+
     selectedInterventions.forEach((intervention) => {
-      const impact = intervention.impact || 2;
+      const baseImpact = intervention.impact || 2;
+      // Double points for priority target domains
+      const weight = targetDomains.includes(intervention.domain) ? 2 : 1;
+      const impact = baseImpact * weight;
       const newScore = newScores[intervention.domain] + impact;
       newScores[intervention.domain] = Math.max(1, Math.min(10, newScore)) as number;
     });
 
-    // Add Referral Scores
+    // Add Referral Scores (also with target domain weighting)
     selectedReferrals.forEach((referral) => {
-      const impact = referral.impact || 1;
+      const baseImpact = referral.impact || 1;
+      const weight = targetDomains.includes(referral.domain) ? 2 : 1;
+      const impact = baseImpact * weight;
       const newScore = newScores[referral.domain] + impact;
       newScores[referral.domain] = Math.max(1, Math.min(10, newScore)) as number;
     });
@@ -217,10 +236,23 @@ export const CaseStudy = ({ population, onBack }: CaseStudyProps) => {
 
     const populationScore = calculatePopulationScore();
 
+    // Check if all critical needs are addressed
+    const criticalNeedsAddressed = population.criticalNeeds
+      ? population.criticalNeeds.every((need) =>
+        need.addressedBy.some((id) =>
+          [...selectedInterventions.map((i) => i.id), ...selectedReferrals.map((r) => r.id)].includes(id)
+        )
+      )
+      : true;
+
     setResults({
       student: newScores,
       max: currentMaxScores,
       populationScore,
+      // Safety tracking
+      unsafePenalty,
+      unsafeInterventions: unsafeInterventions.map((i) => i.id).filter((id): id is string => !!id),
+      criticalNeedsAddressed,
     });
     setSubmitted(true);
     setTimeout(() => {
@@ -296,29 +328,56 @@ export const CaseStudy = ({ population, onBack }: CaseStudyProps) => {
       {/* Show Results OR Scorecard */}
       {submitted && results ? (
         <>
-          <ResultsView
-            baseline={population.patient.uMatterScores}
-            studentResults={results.student}
-            maxResults={results.max}
-            selectedInterventions={selectedInterventions}
-            criticalNeeds={population.criticalNeeds}
-            addressedCriticalNeeds={addressedCriticalNeeds}
-            onReset={onBack}
-            onModify={handleModify}
-            selectedPopulationInterventions={selectedPopulationInterventions}
-            populationScore={results.populationScore}
-          />
-          <div className="mt-8">
-            <UMatterScorecard
-              scores={population.patient.uMatterScores}
-              newScores={results.student}
-              name={population.patient.name}
-              wellnessAnswers={population.patient.wellnessAnswers}
-            />
-          </div>
+          {/* Knowledge Check Quiz */}
+          {showKnowledgeCheck && population.knowledgeCheckQuestions && population.knowledgeCheckQuestions.length > 0 ? (
+            <div className="mb-8">
+              <KnowledgeCheckPanel
+                questions={population.knowledgeCheckQuestions}
+                onComplete={() => { }}
+                onClose={() => setShowKnowledgeCheck(false)}
+              />
+            </div>
+          ) : (
+            <>
+              <ResultsView
+                baseline={population.patient.uMatterScores}
+                studentResults={results.student}
+                maxResults={results.max}
+                selectedInterventions={selectedInterventions}
+                criticalNeeds={population.criticalNeeds}
+                addressedCriticalNeeds={addressedCriticalNeeds}
+                onReset={onBack}
+                onModify={handleModify}
+                selectedPopulationInterventions={selectedPopulationInterventions}
+                populationScore={results.populationScore}
+                targetDomains={population.targetDomains}
+                patientName={population.patient.name}
+                wellnessAnswers={population.patient.wellnessAnswers}
+                unsafePenalty={results.unsafePenalty}
+                unsafeInterventions={results.unsafeInterventions}
+                criticalNeedsAddressed={results.criticalNeedsAddressed}
+              />
+
+              {/* Knowledge Check Button */}
+              {population.knowledgeCheckQuestions && population.knowledgeCheckQuestions.length > 0 && (
+                <div className="mt-6 flex justify-center">
+                  <button
+                    onClick={() => setShowKnowledgeCheck(true)}
+                    className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition flex items-center gap-2 shadow-lg"
+                  >
+                    <span className="text-lg">📝</span>
+                    Take Knowledge Check Quiz
+                  </button>
+                </div>
+              )}
+            </>
+          )}
         </>
       ) : (
         <>
+          {/* Learning Objectives - shown at case start */}
+          <LearningObjectivesPanel objectives={population.learningObjectives} />
+
           <UMatterScorecard
             scores={population.patient.uMatterScores}
             name={population.patient.name}
