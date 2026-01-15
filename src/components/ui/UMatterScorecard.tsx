@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { BarChart2, ChevronDown, ChevronUp } from 'lucide-react';
 import { wellnessDomains } from '../../data/wellnessDomains';
 import { SDOHPanel } from './SDOHPanel';
-import type { WellnessDomainName, WellnessQuestion, SDOHFactor, HRSNIndicator, CriticalNeed } from '../../types';
+import type { WellnessDomainName, WellnessQuestion, SDOHFactor, HRSNIndicator } from '../../types';
 
 interface WellnessScorecardProps {
     scores: Record<WellnessDomainName, number>;
@@ -12,8 +12,6 @@ interface WellnessScorecardProps {
     // SDOH Integration
     sdohFactors?: SDOHFactor[];
     hrsnIndicators?: HRSNIndicator[];
-    criticalNeeds?: CriticalNeed[];
-    addressedCriticalNeeds?: string[];
 }
 
 const answerLabels: Record<number, string> = {
@@ -36,15 +34,13 @@ const DOMAIN_ORDER: WellnessDomainName[] = [
     'Financial'
 ];
 
-export const WellnessScorecard = ({ 
-    scores, 
-    name, 
-    newScores = null, 
+export const WellnessScorecard = ({
+    scores,
+    name,
+    newScores = null,
     wellnessAnswers,
     sdohFactors,
     hrsnIndicators,
-    criticalNeeds = [],
-    addressedCriticalNeeds
 }: WellnessScorecardProps) => {
     const [expandedDomain, setExpandedDomain] = useState<WellnessDomainName | null>(null);
 
@@ -204,8 +200,6 @@ export const WellnessScorecard = ({
                 <SDOHPanel
                     sdohFactors={sdohFactors}
                     hrsnIndicators={hrsnIndicators}
-                    criticalNeeds={criticalNeeds}
-                    addressedCriticalNeeds={addressedCriticalNeeds}
                     embedded={true}
                 />
             )}
